@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/evanwiseman/ppss-server/internal/config"
@@ -30,12 +31,47 @@ func NewLocalServer(cfg *config.Config, dbURL string) (*LocalServer, error) {
 func (s *LocalServer) PostDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	// Parse JSON request
 	var d models.Device
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&d)
 	if err != nil {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		http.Error(
+			w,
+			fmt.Sprintf("invalid JSON: %v", err),
+			http.StatusBadRequest,
+		)
 		return
 	}
 
+	// Create entry in database
+	created, err := s.Queries.CreateDevice(r.Context(), local.CreateDeviceParams{
+		SerialNumber: d.SerialNumber,
+		Name:         d.Name,
+		IpAddress:    d.IpAddress,
+		DeviceType:   d.DeviceType,
+	})
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("unable to create device: %v", err),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	// Respond with created
+	resp := models.DB2Device(created)
+	data, err := json.Marshal(resp)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("unable to pack response: %v", err),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(data)
 }
