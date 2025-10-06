@@ -9,6 +9,7 @@ import (
 	"github.com/evanwiseman/ppss-server/internal/config"
 	"github.com/evanwiseman/ppss-server/internal/database/local"
 	"github.com/evanwiseman/ppss-server/internal/models"
+	"github.com/lib/pq"
 )
 
 type LocalServer struct {
@@ -52,11 +53,13 @@ func (s *LocalServer) PostDeviceHandler(w http.ResponseWriter, r *http.Request) 
 		DeviceType:   d.DeviceType,
 	})
 	if err != nil {
-		http.Error(
-			w,
-			fmt.Sprintf("unable to create device: %v", err),
-			http.StatusInternalServerError,
-		)
+		if pqErr, ok := err.(*pq.Error); ok {
+			if pqErr.Code == "23505" { // unique_violation
+				http.Error(w, fmt.Sprintf("device with serial_number '%s' already exists", d.SerialNumber), http.StatusConflict)
+				return
+			}
+		}
+		http.Error(w, fmt.Sprintf("unable to create device: %v", err), http.StatusInternalServerError)
 		return
 	}
 

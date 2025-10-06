@@ -71,3 +71,57 @@ Serves endpoints and queries from/for users accessing the system from a webpage 
 
 Goal: Users are validated and logged in via their work email and password and validated on the work network. A user would likely need to use the work VPN.
 
+## API
+
+### Local
+
+#### Template
+**Behavior:**
+
+**Request Body:**
+
+**Response (code):**
+
+#### PostDeviceHandler(w *http.ResponseWriter, r http.Request)
+Creates a device in the devices table.
+
+**Behavior:**
+- Unmarshals device parameters from the request body
+- Attempts to create a record in the database
+- Returns the record created
+
+**Request Body:**
+```json
+{
+    "serial_number": "00000000abcdef01",
+    "name": "Test Pi",
+    "ip_address": "192.168.1.10",
+    "device_type": "raspberry_pi"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+    "serial_number": "00000000abcdef01",
+    "name": "Test Pi",
+    "ip_address": "192.168.1.10",
+    "device_type": "raspberry_pi",
+    "created_at": "2025-10-06T11:30:45Z",
+    "updated_at": "2025-10-06T11:30:45Z",
+    "last_seen": null
+}
+```
+
+**Response (400 Bad Request):**
+- JSON is invalid
+
+**Response (409 Conflict):**
+- Device already exists in the database
+
+**Response (500 Internal Server Error):**
+- Unable to create record in database
+- Fail to send a response of the created device
+
+
+
