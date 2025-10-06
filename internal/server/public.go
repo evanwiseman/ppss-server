@@ -1,25 +1,18 @@
 package server
 
 import (
-	"database/sql"
-
 	"github.com/evanwiseman/ppss-server/internal/config"
-	"github.com/evanwiseman/ppss-server/internal/database/public"
+	"github.com/evanwiseman/ppss-server/internal/database"
 )
 
 type PublicServer struct {
-	BaseServer
-	Queries *public.Queries
+	CFG     *config.Config
+	Queries *database.Queries
 }
 
-func NewPublicServer(cfg *config.Config, dbURL string) (*PublicServer, error) {
-	db, err := sql.Open("postgres", dbURL)
-	if err != nil {
-		return nil, err
-	}
-
+func NewPublicServer(cfg *config.Config, queries *database.Queries) (*PublicServer, error) {
 	return &PublicServer{
-		BaseServer: BaseServer{CFG: cfg},
-		Queries:    public.New(db),
+		CFG:     cfg,
+		Queries: queries,
 	}, nil
 }

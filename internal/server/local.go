@@ -1,31 +1,25 @@
 package server
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/evanwiseman/ppss-server/internal/config"
-	"github.com/evanwiseman/ppss-server/internal/database/local"
+	"github.com/evanwiseman/ppss-server/internal/database"
 	"github.com/evanwiseman/ppss-server/internal/models"
 	"github.com/lib/pq"
 )
 
 type LocalServer struct {
-	BaseServer
-	Queries *local.Queries
+	CFG     *config.Config
+	Queries *database.Queries
 }
 
-func NewLocalServer(cfg *config.Config, dbURL string) (*LocalServer, error) {
-	db, err := sql.Open("postgres", dbURL)
-	if err != nil {
-		return nil, err
-	}
-
+func NewLocalServer(cfg *config.Config, queries *database.Queries) (*LocalServer, error) {
 	return &LocalServer{
-		BaseServer: BaseServer{CFG: cfg},
-		Queries:    local.New(db),
+		CFG:     cfg,
+		Queries: queries,
 	}, nil
 }
 
@@ -46,7 +40,7 @@ func (s *LocalServer) PostDeviceHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Create entry in database
-	created, err := s.Queries.CreateDevice(r.Context(), local.CreateDeviceParams{
+	created, err := s.Queries.CreateDevice(r.Context(), database.CreateDeviceParams{
 		SerialNumber: d.SerialNumber,
 		Name:         d.Name,
 		IpAddress:    d.IpAddress,
@@ -77,4 +71,8 @@ func (s *LocalServer) PostDeviceHandler(w http.ResponseWriter, r *http.Request) 
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write(data)
+}
+
+func (s *LocalServer) DeleteDeviceHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 }

@@ -1,11 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/evanwiseman/ppss-server/internal/config"
+	"github.com/evanwiseman/ppss-server/internal/database"
 	"github.com/evanwiseman/ppss-server/internal/server"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -25,16 +26,25 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	// Create local server
-	localSrv, err := server.NewLocalServer(cfg, os.Getenv("DB_LOCAL_URL"))
+	// Open DB once
+	db, err := sql.Open("postgres", cfg.DBURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Wrap DB with queries
+	queries := database.New(db)
+
+	// Create local server with shared queries
+	localSrv, err := server.NewLocalServer(cfg, queries)
 	if err != nil {
 		log.Fatal(err)
 	}
 	localMux := http.NewServeMux()
 	server.LocalRoutes(localSrv, localMux)
 
-	// Create public server
-	publicSrv, err := server.NewPublicServer(cfg, os.Getenv("DB_PUBLIC_URL"))
+	// Create public server with shared queries
+	publicSrv, err := server.NewPublicServer(cfg, queries)
 	if err != nil {
 		log.Fatal(err)
 	}

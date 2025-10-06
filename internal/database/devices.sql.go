@@ -3,7 +3,7 @@
 //   sqlc v1.30.0
 // source: devices.sql
 
-package local
+package database
 
 import (
 	"context"
@@ -21,7 +21,7 @@ INSERT INTO devices (
     $3,
     $4
 )
-RETURNING serial_number, created_at, updated_at, name, ip_address, device_type, last_seen
+RETURNING serial_number, name, ip_address, device_type, created_at, updated_at, last_seen
 `
 
 type CreateDeviceParams struct {
@@ -41,12 +41,22 @@ func (q *Queries) CreateDevice(ctx context.Context, arg CreateDeviceParams) (Dev
 	var i Device
 	err := row.Scan(
 		&i.SerialNumber,
-		&i.CreatedAt,
-		&i.UpdatedAt,
 		&i.Name,
 		&i.IpAddress,
 		&i.DeviceType,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 		&i.LastSeen,
 	)
 	return i, err
+}
+
+const deleteDevice = `-- name: DeleteDevice :exec
+DELETE FROM devices
+WHERE serial_number = $1
+`
+
+func (q *Queries) DeleteDevice(ctx context.Context, serialNumber string) error {
+	_, err := q.db.ExecContext(ctx, deleteDevice, serialNumber)
+	return err
 }

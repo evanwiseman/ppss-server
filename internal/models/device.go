@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/evanwiseman/ppss-server/internal/database/local"
+	"github.com/evanwiseman/ppss-server/internal/database"
 )
 
 type Device struct {
@@ -16,7 +16,7 @@ type Device struct {
 	LastSeen     *time.Time `json:"last_seen,omitempty"`
 }
 
-func DB2Device(d local.Device) Device {
+func DB2Device(d database.Device) Device {
 	var lastSeen *time.Time
 	if d.LastSeen.Valid {
 		lastSeen = &d.LastSeen.Time

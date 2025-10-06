@@ -2,19 +2,28 @@
 // versions:
 //   sqlc v1.30.0
 
-package local
+package database
 
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Device struct {
 	SerialNumber string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
 	Name         string
 	IpAddress    string
 	DeviceType   string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 	LastSeen     sql.NullTime
+}
+
+type User struct {
+	ID        uuid.UUID
+	Email     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

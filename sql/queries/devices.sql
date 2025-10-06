@@ -11,3 +11,7 @@ INSERT INTO devices (
     $4
 )
 RETURNING *;
+
+-- name: DeleteDevice :exec
+DELETE FROM devices
+WHERE serial_number = $1;
