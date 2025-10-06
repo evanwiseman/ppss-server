@@ -1,0 +1,19 @@
+version: "2"
+sql:
+  - name: "local"
+    schema: "sql/schema/local"
+    queries: "sql/queries/local"
+    engine: "postgresql"
+    gen:
+      go:
+        out: "internal/database/local"
+        package: "local"
+    
+  - name: "public"
+    schema: "sql/schema/public"
+    queries: "sql/queries/public"
+    engine: "postgresql"
+    gen:
+      go:
+        out: "internal/database/public"
+        package: "public"
