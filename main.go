@@ -26,7 +26,7 @@ func main() {
 	}
 
 	// Create local server
-	localSrv, err := server.NewServer(cfg, os.Getenv("DB_LOCAL_URL"))
+	localSrv, err := server.NewLocalServer(cfg, os.Getenv("DB_LOCAL_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,7 +34,7 @@ func main() {
 	server.LocalRoutes(localSrv, localMux)
 
 	// Create public server
-	publicSrv, err := server.NewServer(cfg, os.Getenv("DB_PUBLIC_URL"))
+	publicSrv, err := server.NewPublicServer(cfg, os.Getenv("DB_PUBLIC_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}

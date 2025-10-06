@@ -3,11 +3,11 @@ package server
 import "net/http"
 
 // Local LAN routes
-func LocalRoutes(s *Server, mux *http.ServeMux) {
+func LocalRoutes(s *LocalServer, mux *http.ServeMux) {
 
 }
 
 // Public internet routes
-func PublicRoutes(s *Server, mux *http.ServeMux) {
+func PublicRoutes(s *PublicServer, mux *http.ServeMux) {
 
 }

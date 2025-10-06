@@ -7,18 +7,14 @@ package local
 import (
 	"database/sql"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Device struct {
-	ID              uuid.UUID
-	Name            string
-	SerialNumber    sql.NullString
-	IpAddress       sql.NullString
-	FirmwareVersion sql.NullString
-	DeviceType      sql.NullString
-	LastSeen        sql.NullTime
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	SerialNumber string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Name         string
+	IpAddress    string
+	DeviceType   string
+	LastSeen     sql.NullTime
 }

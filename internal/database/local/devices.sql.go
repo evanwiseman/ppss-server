@@ -7,53 +7,46 @@ package local
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createDevice = `-- name: CreateDevice :one
 INSERT INTO devices (
-    name,
     serial_number,
+    name,
     ip_address,
-    firmware_version,
     device_type
 ) VALUES (
     $1,
     $2,
     $3,
-    $4,
-    COALESCE($5, DEFAULT)
+    $4
 )
-RETURNING id, name, serial_number, ip_address, firmware_version, device_type, last_seen, created_at, updated_at
+RETURNING serial_number, created_at, updated_at, name, ip_address, device_type, last_seen
 `
 
 type CreateDeviceParams struct {
-	Name            string
-	SerialNumber    sql.NullString
-	IpAddress       sql.NullString
-	FirmwareVersion sql.NullString
-	Column5         interface{}
+	SerialNumber string
+	Name         string
+	IpAddress    string
+	DeviceType   string
 }
 
 func (q *Queries) CreateDevice(ctx context.Context, arg CreateDeviceParams) (Device, error) {
 	row := q.db.QueryRowContext(ctx, createDevice,
-		arg.Name,
 		arg.SerialNumber,
+		arg.Name,
 		arg.IpAddress,
-		arg.FirmwareVersion,
-		arg.Column5,
+		arg.DeviceType,
 	)
 	var i Device
 	err := row.Scan(
-		&i.ID,
-		&i.Name,
 		&i.SerialNumber,
-		&i.IpAddress,
-		&i.FirmwareVersion,
-		&i.DeviceType,
-		&i.LastSeen,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Name,
+		&i.IpAddress,
+		&i.DeviceType,
+		&i.LastSeen,
 	)
 	return i, err
 }

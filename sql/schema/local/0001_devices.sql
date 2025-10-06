@@ -1,14 +1,12 @@
 -- +goose Up
 CREATE TABLE devices (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,                         -- human friendly name
-    serial_number TEXT UNIQUE,                  -- serial number of device
-    ip_address TEXT,                            -- current ip of device
-    firmware_version TEXT,                      -- current firmware version
-    device_type TEXT DEFAULT 'raspberry_pi', 
-    last_seen TIMESTAMP,
+    serial_number TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    ip_address TEXT NOT NULL,
+    device_type TEXT NOT NULL, 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_seen TIMESTAMP
 );
 
 -- +goose Down
