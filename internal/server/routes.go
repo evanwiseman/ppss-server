@@ -9,6 +9,8 @@ func LocalRoutes(s *LocalServer, mux *http.ServeMux) {
 	mux.HandleFunc("DELETE /devices/{deviceID}", s.DeleteDeviceByIDHandler)
 	mux.HandleFunc("GET /devices", s.GetDevicesHandler)
 	mux.HandleFunc("GET /devices/{deviceID}", s.GetDeviceByIDHandler)
+
+	mux.HandleFunc("POST /admin/reset/devices", s.ResetDevicesHandler)
 }
 
 // Public internet routes

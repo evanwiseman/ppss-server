@@ -109,3 +109,12 @@ func (q *Queries) GetDevices(ctx context.Context) ([]Device, error) {
 	}
 	return items, nil
 }
+
+const resetDevices = `-- name: ResetDevices :exec
+DELETE FROM devices
+`
+
+func (q *Queries) ResetDevices(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, resetDevices)
+	return err
+}

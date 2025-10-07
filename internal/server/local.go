@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/evanwiseman/ppss-server/internal/config"
@@ -166,4 +167,33 @@ func (s *LocalServer) GetDeviceByIDHandler(w http.ResponseWriter, r *http.Reques
 	// Send the response
 	resp := models.DB2Device(row)
 	models.RespondWithJSON(w, http.StatusOK, resp)
+}
+
+func (s *LocalServer) ResetDevicesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Check that platform is in dev
+	// TODO: Check if user is authenticated to reset
+	if s.Cfg.Platform != "dev" {
+		models.RespondWithError(
+			w,
+			http.StatusUnauthorized,
+			"not authorized to reset devices",
+			errors.New("database not on dev platform"),
+		)
+		return
+	}
+
+	// Reset devices in the database
+	err := s.Queries.ResetDevices(r.Context())
+	if err != nil {
+		models.RespondWithError(
+			w,
+			http.StatusInternalServerError,
+			"unable to reset devices",
+			err,
+		)
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

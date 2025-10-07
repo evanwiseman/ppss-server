@@ -22,3 +22,8 @@ GET http://localhost:8080/devices
 ### Get device
 # @name getDevice
 GET http://localhost:8080/devices/{{device_id}}
+
+### Reset devices
+# @name resetDevices
+POST http://localhost:8080/admin/reset/devices
+Content-Type: application/json

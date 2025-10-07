@@ -20,3 +20,6 @@ SELECT * FROM devices;
 -- name: GetDeviceByID :one
 SELECT * FROM devices
 WHERE id = $1;
+
+-- name: ResetDevices :exec
+DELETE FROM devices;
