@@ -1,9 +1,16 @@
-POST http://192.168.1.100:8080/devices
+### device
+# @name postDevice
+POST http://localhost:8080/devices
 Content-Type: application/json
 
 {
-  "serial_number": "00000000abcdef01",
   "name": "Test Pi",
   "ip_address": "192.168.1.10",
   "device_type": "raspberry_pi"
 }
+
+### Store the device id
+@device_id = {{postDevice.response.body.id}}
+
+### Delete device
+DELETE http://localhost:8080/devices/{{device_id}}
