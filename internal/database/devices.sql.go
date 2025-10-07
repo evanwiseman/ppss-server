@@ -7,40 +7,34 @@ package database
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createDevice = `-- name: CreateDevice :one
 INSERT INTO devices (
-    serial_number,
     name,
     ip_address,
     device_type
 ) VALUES (
     $1,
     $2,
-    $3,
-    $4
+    $3
 )
-RETURNING serial_number, name, ip_address, device_type, created_at, updated_at, last_seen
+RETURNING id, name, ip_address, device_type, created_at, updated_at, last_seen
 `
 
 type CreateDeviceParams struct {
-	SerialNumber string
-	Name         string
-	IpAddress    string
-	DeviceType   string
+	Name       string
+	IpAddress  string
+	DeviceType string
 }
 
 func (q *Queries) CreateDevice(ctx context.Context, arg CreateDeviceParams) (Device, error) {
-	row := q.db.QueryRowContext(ctx, createDevice,
-		arg.SerialNumber,
-		arg.Name,
-		arg.IpAddress,
-		arg.DeviceType,
-	)
+	row := q.db.QueryRowContext(ctx, createDevice, arg.Name, arg.IpAddress, arg.DeviceType)
 	var i Device
 	err := row.Scan(
-		&i.SerialNumber,
+		&i.ID,
 		&i.Name,
 		&i.IpAddress,
 		&i.DeviceType,
@@ -53,10 +47,10 @@ func (q *Queries) CreateDevice(ctx context.Context, arg CreateDeviceParams) (Dev
 
 const deleteDevice = `-- name: DeleteDevice :exec
 DELETE FROM devices
-WHERE serial_number = $1
+WHERE id = $1
 `
 
-func (q *Queries) DeleteDevice(ctx context.Context, serialNumber string) error {
-	_, err := q.db.ExecContext(ctx, deleteDevice, serialNumber)
+func (q *Queries) DeleteDevice(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteDevice, id)
 	return err
 }

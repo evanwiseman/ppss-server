@@ -5,20 +5,19 @@
 package database
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type Device struct {
-	SerialNumber string
-	Name         string
-	IpAddress    string
-	DeviceType   string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	LastSeen     sql.NullTime
+	ID         uuid.UUID
+	Name       string
+	IpAddress  string
+	DeviceType string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	LastSeen   time.Time
 }
 
 type User struct {

@@ -15,7 +15,7 @@ import (
 const ()
 
 func main() {
-	// load .env once
+	// Load .env once
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, using OS env variables")
 	}
@@ -27,7 +27,7 @@ func main() {
 	}
 
 	// Open DB once
-	db, err := sql.Open("postgres", cfg.DBURL)
+	db, err := sql.Open("postgres", cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,14 +56,14 @@ func main() {
 
 	// Goroutine for local server
 	go func() {
-		log.Printf("Local server on %s", cfg.LocalAddr)
-		errs <- http.ListenAndServe(cfg.LocalAddr, localMux)
+		log.Printf("Local server on %s", cfg.LocalAddress)
+		errs <- http.ListenAndServe(cfg.LocalAddress, localMux)
 	}()
 
 	// Goroutine for public server
 	go func() {
-		log.Printf("Public server on %s", cfg.PublicAddr)
-		errs <- http.ListenAndServe(cfg.PublicAddr, publicMux)
+		log.Printf("Public server on %s", cfg.PublicAddress)
+		errs <- http.ListenAndServe(cfg.PublicAddress, publicMux)
 	}()
 
 	log.Fatal(<-errs) // block until one server fails

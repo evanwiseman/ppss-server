@@ -6,13 +6,13 @@ import (
 )
 
 type PublicServer struct {
-	CFG     *config.Config
+	Cfg     *config.Config
 	Queries *database.Queries
 }
 
 func NewPublicServer(cfg *config.Config, queries *database.Queries) (*PublicServer, error) {
 	return &PublicServer{
-		CFG:     cfg,
+		Cfg:     cfg,
 		Queries: queries,
 	}, nil
 }
