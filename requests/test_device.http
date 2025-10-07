@@ -14,3 +14,11 @@ Content-Type: application/json
 
 ### Delete device
 DELETE http://localhost:8080/devices/{{device_id}}
+
+### Get all devies
+# @name getDevices
+GET http://localhost:8080/devices
+
+### Get device
+# @name getDevice
+GET http://localhost:8080/devices/{{device_id}}

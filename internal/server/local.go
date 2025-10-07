@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/evanwiseman/ppss-server/internal/config"
@@ -88,13 +87,25 @@ func (s *LocalServer) DeleteDeviceByIDHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	// Delete the device with the matching ID
-	err = s.Queries.DeleteDeviceByID(r.Context(), deviceID)
+	// Check the device exists
+	_, err = s.Queries.GetDeviceByID(r.Context(), deviceID)
 	if err != nil {
 		models.RespondWithError(
 			w,
 			http.StatusNotFound,
 			"device not found",
+			err,
+		)
+		return
+	}
+
+	// Delete the device with the matching ID
+	err = s.Queries.DeleteDeviceByID(r.Context(), deviceID)
+	if err != nil {
+		models.RespondWithError(
+			w,
+			http.StatusInternalServerError,
+			"unable to delete device",
 			err,
 		)
 		return
@@ -131,10 +142,11 @@ func (s *LocalServer) GetDeviceByIDHandler(w http.ResponseWriter, r *http.Reques
 	// Get the device ID
 	deviceID, err := uuid.Parse(r.PathValue("deviceID"))
 	if err != nil {
-		http.Error(
+		models.RespondWithError(
 			w,
-			fmt.Sprintf("invalid id: %v", err),
 			http.StatusBadRequest,
+			"invalid id",
+			err,
 		)
 		return
 	}
@@ -142,10 +154,11 @@ func (s *LocalServer) GetDeviceByIDHandler(w http.ResponseWriter, r *http.Reques
 	// Get the device
 	row, err := s.Queries.GetDeviceByID(r.Context(), deviceID)
 	if err != nil {
-		http.Error(
+		models.RespondWithError(
 			w,
-			fmt.Sprintf("device not with id %v found: %v", deviceID, err),
 			http.StatusNotFound,
+			"device not found",
+			err,
 		)
 		return
 	}
