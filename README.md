@@ -102,7 +102,7 @@ set -e
 # Path to your migrations directory
 MIGRATIONS_DIR="./sql/schema"
 
-# Run goose up on the database
+# Run goose down on the database
 goose -dir "$MIGRATIONS_DIR" postgres "postgres://evan:@localhost:5432/ppss?sslmode=disable" down
 ```
 

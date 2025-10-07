@@ -10,6 +10,13 @@ INSERT INTO devices (
 )
 RETURNING *;
 
+-- name: UpdateDevice :one
+UPDATE devices
+SET name = $2, ip_address = $3, device_type = $4, updated_at = NOW(), last_seen = NOW()
+WHERE id = $1
+RETURNING *;
+
+
 -- name: DeleteDeviceByID :exec
 DELETE FROM devices
 WHERE id = $1;

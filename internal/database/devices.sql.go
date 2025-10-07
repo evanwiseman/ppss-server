@@ -118,3 +118,37 @@ func (q *Queries) ResetDevices(ctx context.Context) error {
 	_, err := q.db.ExecContext(ctx, resetDevices)
 	return err
 }
+
+const updateDevice = `-- name: UpdateDevice :one
+UPDATE devices
+SET name = $2, ip_address = $3, device_type = $4, updated_at = NOW(), last_seen = NOW()
+WHERE id = $1
+RETURNING id, name, ip_address, device_type, created_at, updated_at, last_seen
+`
+
+type UpdateDeviceParams struct {
+	ID         uuid.UUID
+	Name       string
+	IpAddress  string
+	DeviceType string
+}
+
+func (q *Queries) UpdateDevice(ctx context.Context, arg UpdateDeviceParams) (Device, error) {
+	row := q.db.QueryRowContext(ctx, updateDevice,
+		arg.ID,
+		arg.Name,
+		arg.IpAddress,
+		arg.DeviceType,
+	)
+	var i Device
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.IpAddress,
+		&i.DeviceType,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LastSeen,
+	)
+	return i, err
+}

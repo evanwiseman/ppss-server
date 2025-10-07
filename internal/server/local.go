@@ -169,6 +169,45 @@ func (s *LocalServer) GetDeviceByIDHandler(w http.ResponseWriter, r *http.Reques
 	models.RespondWithJSON(w, http.StatusOK, resp)
 }
 
+func (s *LocalServer) PutDevicesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Parse JSON request
+	var d models.Device
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&d)
+	if err != nil {
+		models.RespondWithError(
+			w,
+			http.StatusBadRequest,
+			"invalid JSON",
+			err,
+		)
+		return
+	}
+
+	// Update the device
+	updated, err := s.Queries.UpdateDevice(r.Context(), database.UpdateDeviceParams{
+		ID:         d.ID,
+		Name:       d.Name,
+		IpAddress:  d.IpAddress,
+		DeviceType: d.DeviceType,
+	})
+	if err != nil {
+		models.RespondWithError(
+			w,
+			http.StatusInternalServerError,
+			"unable to update device",
+			err,
+		)
+		return
+	}
+
+	// Send the response
+	resp := models.DB2Device(updated)
+	models.RespondWithJSON(w, http.StatusOK, resp)
+}
+
 func (s *LocalServer) ResetDevicesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
