@@ -60,6 +60,52 @@ sqlc version
 
 **Make sure $GOPATH/bin (or %GOPATH%\bin on Windows) is in your PATH.**
 
+### .env (local setup for development)
+Create a .env file in the root of the projet directory. Ensure .env is in your .gitignore.
+
+```
+# Local network interface for Pis
+LOCAL_ADDRESS="localhost:8080"
+
+# Public interface for remote access
+PUBLIC_ADDRESS="0.0.0.0:443"
+
+# Database urls
+DATABASE_URL="postgres://evan:@localhost:5432/ppss?sslmode=disable"
+
+# Current platform
+PLATFORM="dev"
+```
+
+### Up and Down Migrations
+I made a shell script to perform my up and down migrations in goose so I don't have to navigate to sql/schema to perform the up and down migrations.
+
+Remember these files are set for a local/dev configuration, for a production build update the update the postgres url.
+
+up.sh
+```
+#!/bin/sh
+set -e
+
+# Path to your migrations directory
+MIGRATIONS_DIR="./sql/schema"
+
+# Run goose up on the database
+goose -dir "$MIGRATIONS_DIR" postgres "postgres://evan:@localhost:5432/ppss?sslmode=disable" up
+```
+
+down.sh
+```
+#!/bin/sh
+set -e
+
+# Path to your migrations directory
+MIGRATIONS_DIR="./sql/schema"
+
+# Run goose up on the database
+goose -dir "$MIGRATIONS_DIR" postgres "postgres://evan:@localhost:5432/ppss?sslmode=disable" down
+```
+
 ## Server
 There exists 2 databases and 2 places to serve endpoints from, locally and publicly.
 
