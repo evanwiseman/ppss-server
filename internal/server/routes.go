@@ -4,8 +4,11 @@ import "net/http"
 
 // Local LAN routes
 func LocalRoutes(s *LocalServer, mux *http.ServeMux) {
+	// Device Endpoints
 	mux.HandleFunc("POST /devices", s.PostDeviceHandler)
 	mux.HandleFunc("DELETE /devices/{deviceID}", s.DeleteDeviceByIDHandler)
+	mux.HandleFunc("GET /devices", s.GetDevicesHandler)
+	mux.HandleFunc("GET /device/{deviceID}", s.GetDeviceByIDHandler)
 }
 
 // Public internet routes

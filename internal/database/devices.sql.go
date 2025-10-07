@@ -54,3 +54,58 @@ func (q *Queries) DeleteDeviceByID(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteDeviceByID, id)
 	return err
 }
+
+const getDeviceByID = `-- name: GetDeviceByID :one
+SELECT id, name, ip_address, device_type, created_at, updated_at, last_seen FROM devices
+WHERE id = $1
+`
+
+func (q *Queries) GetDeviceByID(ctx context.Context, id uuid.UUID) (Device, error) {
+	row := q.db.QueryRowContext(ctx, getDeviceByID, id)
+	var i Device
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.IpAddress,
+		&i.DeviceType,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LastSeen,
+	)
+	return i, err
+}
+
+const getDevices = `-- name: GetDevices :many
+SELECT id, name, ip_address, device_type, created_at, updated_at, last_seen FROM devices
+`
+
+func (q *Queries) GetDevices(ctx context.Context) ([]Device, error) {
+	rows, err := q.db.QueryContext(ctx, getDevices)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Device
+	for rows.Next() {
+		var i Device
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.IpAddress,
+			&i.DeviceType,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.LastSeen,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

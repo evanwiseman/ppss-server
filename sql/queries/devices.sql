@@ -13,3 +13,10 @@ RETURNING *;
 -- name: DeleteDeviceByID :exec
 DELETE FROM devices
 WHERE id = $1;
+
+-- name: GetDevices :many
+SELECT * FROM devices;
+
+-- name: GetDeviceByID :one
+SELECT * FROM devices
+WHERE id = $1;
