@@ -82,8 +82,8 @@ Goal: Users are validated and logged in via their work email and password and va
 
 **Response (code):**
 
-#### PostDeviceHandler(w *http.ResponseWriter, r http.Request)
-Creates a device in the devices table.
+#### PostDeviceHandler
+Creates a device in the devices table
 
 **Behavior:**
 - Unmarshals device parameters from the request body
@@ -123,5 +123,120 @@ Creates a device in the devices table.
 - Unable to create record in database
 - Fail to send a response of the created device
 
+#### DeleteDeviceByIDHandler
+Deletes a device with a given ID
 
+**Behavior:**
+- Parses the device ID in the URL `/devices/{deviceID}`
+- Checks if the device is in the database
+- Deletes the device with the ID
+- Returns no content
 
+**Request Body:**
+```
+<empty>
+```
+
+**Response (204 No Content):**
+```
+<empty>
+```
+
+**Response (400 Bad Request):**
+- Invalid ID is provided in URL
+
+**Response (404 Not Found):**
+- No device with ID is found in the database
+
+**Response (500 Internal Server Error):**
+- Unable to delete the device in the database
+
+#### GetDevicesHandler
+Gets all devices in the database
+
+**Behavior:**
+- Queries for all devices in the database
+- Formats a response as a slice of devices in json format
+- Returns a list of all devices
+
+**Request Body:**
+```
+<empty>
+```
+
+**Response (200 Ok):**
+```json
+{
+    {
+        "serial_number": "00000000abcdef01",
+        "name": "Test Pi 1",
+        "ip_address": "192.168.1.10",
+        "device_type": "raspberry_pi",
+        "created_at": "2025-10-06T11:30:45Z",
+        "updated_at": "2025-10-06T11:30:45Z",
+        "last_seen": null
+    },
+    {
+        "serial_number": "00000000abcdef02",
+        "name": "Test Pi 2",
+        "ip_address": "192.168.1.11",
+        "device_type": "raspberry_pi",
+        "created_at": "2025-10-06T11:30:45Z",
+        "updated_at": "2025-10-06T11:30:45Z",
+        "last_seen": null
+    }
+}
+```
+
+**Response (404 Not Found):**
+- The devices database is not found
+
+#### GetDeviceByIDHandler
+Gets the device matching an ID
+
+**Behavior:**
+- Parses the device ID in the URL `/devices/{deviceID}`
+- Find the device in the database
+- Return the device as a JSON
+
+**Request Body:**
+```
+<empty>
+```
+
+**Response (200 Ok):**
+```json
+{
+    "serial_number": "00000000abcdef01",
+    "name": "Test Pi 1",
+    "ip_address": "192.168.1.10",
+    "device_type": "raspberry_pi",
+    "created_at": "2025-10-06T11:30:45Z",
+    "updated_at": "2025-10-06T11:30:45Z",
+    "last_seen": null
+}
+```
+
+**Response (400 Bad Request):**
+- Invalid ID is provided in URL
+
+**Response (404 Not Found):**
+- The devices database is not found
+
+#### ResetDevicesHandler
+Clears the entire devices table
+
+**Behavior:**
+- Check the platform before reseting
+- Reset the device table
+
+**Request Body:**
+```
+<empty>
+```
+
+**Response (401 Unauthorized):**
+- When the platform is not = "dev" in the config
+
+**Response (500 Internal Server Error):**
+- Unable to reset the devices table
