@@ -8,6 +8,7 @@ import (
 	"github.com/evanwiseman/ppss-server/internal/config"
 	"github.com/evanwiseman/ppss-server/internal/database"
 	"github.com/evanwiseman/ppss-server/internal/models"
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
@@ -48,7 +49,11 @@ func (s *LocalServer) PostDeviceHandler(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			if pqErr.Code == "23505" { // unique_violation
-				http.Error(w, fmt.Sprintf("device with id '%v' already exists", d.ID), http.StatusConflict)
+				http.Error(
+					w,
+					fmt.Sprintf("device with id '%v' already exists", d.ID),
+					http.StatusConflict,
+				)
 				return
 			}
 		}
@@ -72,6 +77,30 @@ func (s *LocalServer) PostDeviceHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write(data)
 }
 
-func (s *LocalServer) DeleteDeviceHandler(w http.ResponseWriter, r *http.Request) {
+func (s *LocalServer) DeleteDeviceByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
+	// Get the device ID
+	deviceID, err := uuid.Parse(r.PathValue("deviceID"))
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("invalid id: %v", err),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	// Delete the device with the matching ID
+	err = s.Queries.DeleteDeviceByID(r.Context(), deviceID)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("device not found: %v", err),
+			http.StatusNotFound,
+		)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

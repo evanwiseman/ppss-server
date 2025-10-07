@@ -45,12 +45,12 @@ func (q *Queries) CreateDevice(ctx context.Context, arg CreateDeviceParams) (Dev
 	return i, err
 }
 
-const deleteDevice = `-- name: DeleteDevice :exec
+const deleteDeviceByID = `-- name: DeleteDeviceByID :exec
 DELETE FROM devices
 WHERE id = $1
 `
 
-func (q *Queries) DeleteDevice(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, deleteDevice, id)
+func (q *Queries) DeleteDeviceByID(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteDeviceByID, id)
 	return err
 }

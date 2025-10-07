@@ -10,6 +10,6 @@ INSERT INTO devices (
 )
 RETURNING *;
 
--- name: DeleteDevice :exec
+-- name: DeleteDeviceByID :exec
 DELETE FROM devices
 WHERE id = $1;
