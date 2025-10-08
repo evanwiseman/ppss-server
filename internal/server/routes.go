@@ -11,6 +11,9 @@ func LocalRoutes(s *LocalServer, mux *http.ServeMux) {
 	mux.HandleFunc("PUT /devices", s.PutDevicesHandler)
 	mux.HandleFunc("DELETE /devices/{deviceID}", s.DeleteDeviceByIDHandler)
 
+	// WDLM Endpoints
+
+	// Admin Endpoints
 	mux.HandleFunc("POST /admin/reset/devices", s.ResetDevicesHandler)
 }
 

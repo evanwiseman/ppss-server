@@ -1,18 +1,11 @@
 -- name: CreateDevice :one
-INSERT INTO devices (
-    name,
-    ip_address,
-    device_type
-) VALUES (
-    $1,
-    $2,
-    $3
-)
+INSERT INTO devices (name,type)
+VALUES ($1,$2)
 RETURNING *;
 
 -- name: UpdateDevice :one
 UPDATE devices
-SET name = $2, ip_address = $3, device_type = $4, updated_at = NOW(), last_seen = NOW()
+SET name = $2, type = $3, updated_at = NOW()
 WHERE id = $1
 RETURNING *;
 

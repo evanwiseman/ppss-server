@@ -12,35 +12,26 @@ import (
 )
 
 const createDevice = `-- name: CreateDevice :one
-INSERT INTO devices (
-    name,
-    ip_address,
-    device_type
-) VALUES (
-    $1,
-    $2,
-    $3
-)
-RETURNING id, name, ip_address, device_type, created_at, updated_at, last_seen
+INSERT INTO devices (name,type)
+VALUES ($1,$2)
+RETURNING id, name, type, created_at, updated_at, last_seen_at
 `
 
 type CreateDeviceParams struct {
-	Name       string
-	IpAddress  string
-	DeviceType string
+	Name string
+	Type string
 }
 
 func (q *Queries) CreateDevice(ctx context.Context, arg CreateDeviceParams) (Device, error) {
-	row := q.db.QueryRowContext(ctx, createDevice, arg.Name, arg.IpAddress, arg.DeviceType)
+	row := q.db.QueryRowContext(ctx, createDevice, arg.Name, arg.Type)
 	var i Device
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.IpAddress,
-		&i.DeviceType,
+		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.LastSeen,
+		&i.LastSeenAt,
 	)
 	return i, err
 }
@@ -56,7 +47,7 @@ func (q *Queries) DeleteDeviceByID(ctx context.Context, id uuid.UUID) error {
 }
 
 const getDeviceByID = `-- name: GetDeviceByID :one
-SELECT id, name, ip_address, device_type, created_at, updated_at, last_seen FROM devices
+SELECT id, name, type, created_at, updated_at, last_seen_at FROM devices
 WHERE id = $1
 `
 
@@ -66,17 +57,16 @@ func (q *Queries) GetDeviceByID(ctx context.Context, id uuid.UUID) (Device, erro
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.IpAddress,
-		&i.DeviceType,
+		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.LastSeen,
+		&i.LastSeenAt,
 	)
 	return i, err
 }
 
 const getDevices = `-- name: GetDevices :many
-SELECT id, name, ip_address, device_type, created_at, updated_at, last_seen FROM devices
+SELECT id, name, type, created_at, updated_at, last_seen_at FROM devices
 `
 
 func (q *Queries) GetDevices(ctx context.Context) ([]Device, error) {
@@ -91,11 +81,10 @@ func (q *Queries) GetDevices(ctx context.Context) ([]Device, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
-			&i.IpAddress,
-			&i.DeviceType,
+			&i.Type,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.LastSeen,
+			&i.LastSeenAt,
 		); err != nil {
 			return nil, err
 		}
@@ -121,34 +110,27 @@ func (q *Queries) ResetDevices(ctx context.Context) error {
 
 const updateDevice = `-- name: UpdateDevice :one
 UPDATE devices
-SET name = $2, ip_address = $3, device_type = $4, updated_at = NOW(), last_seen = NOW()
+SET name = $2, type = $3, updated_at = NOW()
 WHERE id = $1
-RETURNING id, name, ip_address, device_type, created_at, updated_at, last_seen
+RETURNING id, name, type, created_at, updated_at, last_seen_at
 `
 
 type UpdateDeviceParams struct {
-	ID         uuid.UUID
-	Name       string
-	IpAddress  string
-	DeviceType string
+	ID   uuid.UUID
+	Name string
+	Type string
 }
 
 func (q *Queries) UpdateDevice(ctx context.Context, arg UpdateDeviceParams) (Device, error) {
-	row := q.db.QueryRowContext(ctx, updateDevice,
-		arg.ID,
-		arg.Name,
-		arg.IpAddress,
-		arg.DeviceType,
-	)
+	row := q.db.QueryRowContext(ctx, updateDevice, arg.ID, arg.Name, arg.Type)
 	var i Device
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.IpAddress,
-		&i.DeviceType,
+		&i.Type,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.LastSeen,
+		&i.LastSeenAt,
 	)
 	return i, err
 }

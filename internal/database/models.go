@@ -13,9 +13,24 @@ import (
 type Device struct {
 	ID         uuid.UUID
 	Name       string
-	IpAddress  string
-	DeviceType string
+	Type       string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
-	LastSeen   time.Time
+	LastSeenAt time.Time
+}
+
+type Sensor struct {
+	ID         uuid.UUID
+	Name       string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	LastSeenAt time.Time
+}
+
+type Wdlm struct {
+	ID         uuid.UUID
+	Name       string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	LastSeenAt time.Time
 }
