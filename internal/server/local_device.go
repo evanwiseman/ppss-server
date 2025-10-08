@@ -62,46 +62,41 @@ func (ls *LocalServer) PostDeviceHandler(w http.ResponseWriter, r *http.Request)
 	models.RespondWithJSON(w, http.StatusCreated, resp)
 }
 
-func (ls *LocalServer) DeleteDeviceByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (ls *LocalServer) PutDevicesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Get the device ID
-	deviceID, err := uuid.Parse(r.PathValue("deviceID"))
+	// Parse JSON request
+	var params struct {
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
+		Type string    `json:"type"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&params)
 	if err != nil {
-		models.RespondWithError(
-			w,
-			http.StatusBadRequest,
-			"invalid id",
-			err,
-		)
+		models.RespondWithError(w, http.StatusBadRequest, "invalid JSON", err)
 		return
 	}
 
-	// Check the device exists
-	_, err = ls.Queries.GetDeviceByID(r.Context(), deviceID)
-	if err != nil {
-		models.RespondWithError(
-			w,
-			http.StatusNotFound,
-			"device not found",
-			err,
-		)
-		return
-	}
-
-	// Delete the device with the matching ID
-	err = ls.Queries.DeleteDeviceByID(r.Context(), deviceID)
+	// Update the device
+	updated, err := ls.Queries.UpdateDevice(r.Context(), database.UpdateDeviceParams{
+		ID:   params.ID,
+		Name: params.Name,
+		Type: params.Type,
+	})
 	if err != nil {
 		models.RespondWithError(
 			w,
 			http.StatusInternalServerError,
-			"unable to delete device",
+			"unable to update device",
 			err,
 		)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	// Send the response
+	resp := models.DB2Device(updated)
+	models.RespondWithJSON(w, http.StatusOK, resp)
 }
 
 func (ls *LocalServer) GetDevicesHandler(w http.ResponseWriter, r *http.Request) {
@@ -159,46 +154,46 @@ func (ls *LocalServer) GetDeviceByIDHandler(w http.ResponseWriter, r *http.Reque
 	models.RespondWithJSON(w, http.StatusOK, resp)
 }
 
-func (ls *LocalServer) PutDevicesHandler(w http.ResponseWriter, r *http.Request) {
+func (ls *LocalServer) DeleteDeviceByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Parse JSON request
-	var params struct {
-		ID   uuid.UUID `json:"id"`
-		Name string    `json:"name"`
-		Type string    `json:"type"`
-	}
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&params)
+	// Get the device ID
+	deviceID, err := uuid.Parse(r.PathValue("deviceID"))
 	if err != nil {
 		models.RespondWithError(
 			w,
 			http.StatusBadRequest,
-			"invalid JSON",
+			"invalid id",
 			err,
 		)
 		return
 	}
 
-	// Update the device
-	updated, err := ls.Queries.UpdateDevice(r.Context(), database.UpdateDeviceParams{
-		ID:   params.ID,
-		Name: params.Name,
-		Type: params.Type,
-	})
+	// Check the device exists
+	_, err = ls.Queries.GetDeviceByID(r.Context(), deviceID)
+	if err != nil {
+		models.RespondWithError(
+			w,
+			http.StatusNotFound,
+			"device not found",
+			err,
+		)
+		return
+	}
+
+	// Delete the device with the matching ID
+	err = ls.Queries.DeleteDeviceByID(r.Context(), deviceID)
 	if err != nil {
 		models.RespondWithError(
 			w,
 			http.StatusInternalServerError,
-			"unable to update device",
+			"unable to delete device",
 			err,
 		)
 		return
 	}
 
-	// Send the response
-	resp := models.DB2Device(updated)
-	models.RespondWithJSON(w, http.StatusOK, resp)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (ls *LocalServer) ResetDevicesHandler(w http.ResponseWriter, r *http.Request) {

@@ -7,6 +7,8 @@ package database
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createWdlm = `-- name: CreateWdlm :one
@@ -20,6 +22,31 @@ RETURNING id, name, created_at, updated_at, last_seen_at
 
 func (q *Queries) CreateWdlm(ctx context.Context, name string) (Wdlm, error) {
 	row := q.db.QueryRowContext(ctx, createWdlm, name)
+	var i Wdlm
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LastSeenAt,
+	)
+	return i, err
+}
+
+const updateWdlm = `-- name: UpdateWdlm :one
+UPDATE wdlms
+SET name = $2, updated_at = NOW()
+WHERE id = $1
+RETURNING id, name, created_at, updated_at, last_seen_at
+`
+
+type UpdateWdlmParams struct {
+	ID   uuid.UUID
+	Name string
+}
+
+func (q *Queries) UpdateWdlm(ctx context.Context, arg UpdateWdlmParams) (Wdlm, error) {
+	row := q.db.QueryRowContext(ctx, updateWdlm, arg.ID, arg.Name)
 	var i Wdlm
 	err := row.Scan(
 		&i.ID,
