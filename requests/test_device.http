@@ -4,16 +4,23 @@ POST http://localhost:8080/devices
 Content-Type: application/json
 
 {
-  "name": "Test Pi",
-  "ip_address": "192.168.1.10",
-  "device_type": "raspberry_pi"
+    "name": "pi-1",
+    "type": "pi"
 }
 
 ### Store the device id
 @device_id = {{postDevice.response.body.id}}
 
-### Delete device
-DELETE http://localhost:8080/devices/{{device_id}}
+### Put/Update device
+# @name putDevice
+PUT http://localhost:8080/devices
+Content-Type: application/json
+
+{
+    "id": "{{device_id}}",
+    "name": "$pi-1-modified",
+    "type": "pi"
+}
 
 ### Get all devies
 # @name getDevices
@@ -22,6 +29,10 @@ GET http://localhost:8080/devices
 ### Get device
 # @name getDevice
 GET http://localhost:8080/devices/{{device_id}}
+
+### Delete device
+# @name deleteDevice
+DELETE http://localhost:8080/devices/{{device_id}}
 
 ### Reset devices
 # @name resetDevices

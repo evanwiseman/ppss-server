@@ -1,0 +1,33 @@
+### Create Wdlm
+# @name postWdlm
+POST http://localhost:8080/wdlms
+Content-Type: application/json
+
+{
+    "name": "wdlm-1"
+}
+
+### Store the wdlm id
+@wdlm_id = {{postWdlm.response.body.id}}
+
+### Put/Update wdlm
+# @name putWdlm
+PUT http://localhost:8080/wdlms
+Content-Type: application/json
+
+{
+    "id": "{{wdlm_id}}",
+    "name": "wdlm-1-modified"
+}
+
+### Get all wdlms
+# @name getWdlms
+GET http://localhost:8080/wdlms
+
+### Get wdlm
+# @name getWdlm
+GET http://localhost:8080/wdlms/{{wdlm_id}}
+
+### Delete wdlm
+# @name deleteWdlm
+DELETE http://localhost:8080/wdlms/{{wdlm_id}}
