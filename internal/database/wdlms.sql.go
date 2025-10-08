@@ -33,6 +33,39 @@ func (q *Queries) CreateWdlm(ctx context.Context, name string) (Wdlm, error) {
 	return i, err
 }
 
+const getWdlms = `-- name: GetWdlms :many
+SELECT id, name, created_at, updated_at, last_seen_at FROM wdlms
+`
+
+func (q *Queries) GetWdlms(ctx context.Context) ([]Wdlm, error) {
+	rows, err := q.db.QueryContext(ctx, getWdlms)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Wdlm
+	for rows.Next() {
+		var i Wdlm
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.LastSeenAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateWdlm = `-- name: UpdateWdlm :one
 UPDATE wdlms
 SET name = $2, updated_at = NOW()

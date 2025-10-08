@@ -82,3 +82,26 @@ func (ls *LocalServer) PutWdlmHandler(w http.ResponseWriter, r *http.Request) {
 	resp := models.DB2Wdlm(updated)
 	models.RespondWithJSON(w, http.StatusOK, resp)
 }
+
+func (ls *LocalServer) GetWdlmsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get all entries in wdlms table
+	rows, err := ls.Queries.GetWdlms(r.Context())
+	if err != nil {
+		models.RespondWithError(
+			w,
+			http.StatusInternalServerError,
+			"wdlm table missing",
+			err,
+		)
+		return
+	}
+
+	// Send the response of all entries
+	var wdlms []models.Wdlm
+	for _, row := range rows {
+		wdlms = append(wdlms, models.DB2Wdlm(row))
+	}
+	models.RespondWithJSON(w, http.StatusOK, wdlms)
+}

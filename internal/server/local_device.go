@@ -107,8 +107,8 @@ func (ls *LocalServer) GetDevicesHandler(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		models.RespondWithError(
 			w,
-			http.StatusNotFound,
-			"no devices found",
+			http.StatusInternalServerError,
+			"device table missing",
 			err,
 		)
 		return
