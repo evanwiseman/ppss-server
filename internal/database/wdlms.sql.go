@@ -33,6 +33,16 @@ func (q *Queries) CreateWdlm(ctx context.Context, name string) (Wdlm, error) {
 	return i, err
 }
 
+const deleteWdlmByID = `-- name: DeleteWdlmByID :exec
+DELETE FROM wdlms
+WHERE id = $1
+`
+
+func (q *Queries) DeleteWdlmByID(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteWdlmByID, id)
+	return err
+}
+
 const getWdlmByID = `-- name: GetWdlmByID :one
 SELECT id, name, created_at, updated_at, last_seen_at FROM wdlms
 WHERE id = $1

@@ -18,3 +18,7 @@ SELECT * FROM wdlms;
 -- name: GetWdlmByID :one
 SELECT * FROM wdlms
 WHERE id = $1;
+
+-- name: DeleteWdlmByID :exec
+DELETE FROM wdlms
+WHERE id = $1;

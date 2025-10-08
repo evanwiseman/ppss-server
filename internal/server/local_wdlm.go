@@ -106,7 +106,7 @@ func (ls *LocalServer) GetWdlmsHandler(w http.ResponseWriter, r *http.Request) {
 	models.RespondWithJSON(w, http.StatusOK, wdlms)
 }
 
-func (ls *LocalServer) GetWdlmsByIDHandler(w http.ResponseWriter, r *http.Request) {
+func (ls *LocalServer) GetWdlmByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// Get the wdlm id
@@ -126,4 +126,31 @@ func (ls *LocalServer) GetWdlmsByIDHandler(w http.ResponseWriter, r *http.Reques
 	// Respond with the wdlm
 	resp := models.DB2Wdlm(row)
 	models.RespondWithJSON(w, http.StatusOK, resp)
+}
+
+func (ls *LocalServer) DeleteWdlmByID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get the wdlm id
+	wdlmID, err := uuid.Parse(r.PathValue("wdlmID"))
+	if err != nil {
+		models.RespondWithError(w, http.StatusBadRequest, "invalid wdlm id", err)
+		return
+	}
+
+	// Check the wdlm exists
+	_, err = ls.Queries.GetWdlmByID(r.Context(), wdlmID)
+	if err != nil {
+		models.RespondWithError(w, http.StatusNotFound, "wdlm not found", err)
+		return
+	}
+
+	// Delete the wdlm
+	err = ls.Queries.DeleteWdlmByID(r.Context(), wdlmID)
+	if err != nil {
+		models.RespondWithError(w, http.StatusInternalServerError, "unable to delte wdlm", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
