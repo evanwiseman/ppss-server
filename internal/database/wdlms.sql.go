@@ -33,6 +33,24 @@ func (q *Queries) CreateWdlm(ctx context.Context, name string) (Wdlm, error) {
 	return i, err
 }
 
+const getWdlmByID = `-- name: GetWdlmByID :one
+SELECT id, name, created_at, updated_at, last_seen_at FROM wdlms
+WHERE id = $1
+`
+
+func (q *Queries) GetWdlmByID(ctx context.Context, id uuid.UUID) (Wdlm, error) {
+	row := q.db.QueryRowContext(ctx, getWdlmByID, id)
+	var i Wdlm
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LastSeenAt,
+	)
+	return i, err
+}
+
 const getWdlms = `-- name: GetWdlms :many
 SELECT id, name, created_at, updated_at, last_seen_at FROM wdlms
 `
